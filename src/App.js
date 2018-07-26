@@ -1,4 +1,6 @@
 import React, { PureComponent } from 'react';
+import socketIOClient from 'socket.io-client';
+
 import './App.css';
 import ConnectFour from './ConnectFour'
 
@@ -9,10 +11,19 @@ class App extends PureComponent {
       player: 1,
       winner: false,
       reset: false,
+      response: false,
     };
 
     this.setScoreboard = this.setScoreboard.bind(this);
     this.triggerReset = this.triggerReset.bind(this);
+  }
+
+  componentDidMount() {
+    const socket = socketIOClient("http://127.0.0.1:8080");
+    socket.on("FromAPI", data => {
+      console.log('data from api', data);
+      this.setState({ response: data })
+    });
   }
 
   setScoreboard({ player, winner, reset }) {
@@ -28,9 +39,13 @@ class App extends PureComponent {
   }
 
   render() {
-    const { player, reset, winner } = this.state;
+    const { player, reset, response, winner } = this.state;
     return (
       <div className="App">
+        {
+          response ? <p>The temperature in Florence is: {response} °F</p>
+          : <p>Loading...</p>
+        }
         <div className="scoreboard">
           <div className="scoreboard-text">
             <h1>Connect Four</h1>
