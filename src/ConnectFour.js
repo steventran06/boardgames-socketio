@@ -1,6 +1,8 @@
 import React, { PureComponent } from 'react';
 import './App.css';
 import Row from './Row';
+import socketIOClient from 'socket.io-client';
+const socket = socketIOClient("http://127.0.0.1:8080");
 
 class ConnectFour extends PureComponent {
   constructor() {
@@ -21,7 +23,6 @@ class ConnectFour extends PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log(nextProps.reset, this.props.reset)
     if (nextProps.reset && !this.props.reset) {
       this.setState({
         board: [
@@ -44,7 +45,7 @@ class ConnectFour extends PureComponent {
       vertCount++;
     }
     if (vertCount >= 4) {
-      return true;
+      return player;
     }
     
     // check for horizontal win
@@ -59,7 +60,7 @@ class ConnectFour extends PureComponent {
       horizCount++;
     }
     if (horizCount >= 4) {
-      return true;
+      return player;
     }
 
     // check for minor diagonal win
@@ -74,7 +75,7 @@ class ConnectFour extends PureComponent {
       minorCount++;
     }
     if (minorCount >= 4) {
-      return true;
+      return player;
     }
 
     // check for major diagonal win
@@ -89,7 +90,7 @@ class ConnectFour extends PureComponent {
       majorCount++;
     }
     if (majorCount >= 4) {
-      return true;
+      return player;
     }
     return false;
   }
@@ -118,10 +119,10 @@ class ConnectFour extends PureComponent {
 
       const winner = this.checkWin(row, col, player);
       setScoreboard({
-        player: player === 2 ? 1 : 2,
         winner,
         reset: false
       })
+      socket.emit("playerClick", player);
     }
   }
 

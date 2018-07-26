@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react';
 import socketIOClient from 'socket.io-client';
+const socket = socketIOClient("http://127.0.0.1:8080");
 
 import './App.css';
 import ConnectFour from './ConnectFour'
@@ -11,7 +12,6 @@ class App extends PureComponent {
       player: 1,
       winner: false,
       reset: false,
-      response: false,
     };
 
     this.setScoreboard = this.setScoreboard.bind(this);
@@ -19,15 +19,13 @@ class App extends PureComponent {
   }
 
   componentDidMount() {
-    const socket = socketIOClient("http://127.0.0.1:8080");
-    socket.on("FromAPI", data => {
-      console.log('data from api', data);
-      this.setState({ response: data })
+    socket.on("playerTurn", player => {
+      this.setState({ player })
     });
   }
 
-  setScoreboard({ player, winner, reset }) {
-    this.setState({ player, winner, reset })
+  setScoreboard({ winner, reset }) {
+    this.setState({ winner, reset })
   }
 
   triggerReset() {
@@ -35,21 +33,17 @@ class App extends PureComponent {
       player: 1,
       reset: true,
       winner: false,
-    })
+    });
   }
 
   render() {
-    const { player, reset, response, winner } = this.state;
+    const { player, reset, winner } = this.state;
     return (
       <div className="App">
-        {
-          response ? <p>The temperature in Florence is: {response} °F</p>
-          : <p>Loading...</p>
-        }
         <div className="scoreboard">
           <div className="scoreboard-text">
             <h1>Connect Four</h1>
-            <h2>{`Player ${player}'s ${winner ? 'the winner!' : 'turn'}`}</h2>
+            <h2>{winner ? `Player ${winner} is the winner!` : `Player ${player}'s turn`}</h2>
             {winner &&
               <button
                 onClick={this.triggerReset}
