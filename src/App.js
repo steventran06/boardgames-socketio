@@ -3,12 +3,17 @@ import socketIOClient from 'socket.io-client';
 const socket = socketIOClient("http://127.0.0.1:8080");
 
 import './App.css';
-import ConnectFour from './ConnectFour'
+import ConnectFour from './ConnectFour';
+import CreateGame from './CreateGame';
 
 class App extends PureComponent {
   constructor() {
     super();
+
+    // check for url parameter for game
+    const game = window.location.search.substr(1).split('=')[1];
     this.state = {
+      hasGameParam: game,
       player: 1,
       winner: false,
       reset: false,
@@ -19,8 +24,10 @@ class App extends PureComponent {
   }
 
   componentDidMount() {
-    socket.on("playerTurn", player => {
-      this.setState({ player })
+    socket.on('boardResponse', data => {
+      this.setState({
+        player: data.player
+      });
     });
   }
 
@@ -37,22 +44,37 @@ class App extends PureComponent {
   }
 
   render() {
-    const { player, reset, winner } = this.state;
+    const { hasGameParam, player, reset, winner } = this.state;
     return (
       <div className="App">
         <div className="scoreboard">
           <div className="scoreboard-text">
-            <h1>Connect Four</h1>
-            <h2>{winner ? `Player ${winner} is the winner!` : `Player ${player}'s turn`}</h2>
-            {winner &&
-              <button
-                onClick={this.triggerReset}
-              >
-                Start Game
-              </button>}
+          {hasGameParam ? (
+            <div>
+              <h1>Connect Four</h1>
+              <h2>{winner ?
+                `Player ${winner} is the winner!` :
+                `Player ${player}'s turn`}
+              </h2>
+              {winner &&
+                <button
+                  onClick={this.triggerReset}
+                >
+                  Start Game
+                </button>
+              }
+            </div>
+            ) : (
+              <h2>Create New Game</h2>
+            )}
           </div>
         </div>
-        <ConnectFour player={player} setScoreboard={this.setScoreboard} reset={reset} />
+        {hasGameParam ? (
+          <ConnectFour player={player} setScoreboard={this.setScoreboard} reset={reset} />
+          ) : (
+            <CreateGame />
+          )
+        }
       </div>
     );
   }

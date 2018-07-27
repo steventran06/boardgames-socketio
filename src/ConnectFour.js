@@ -1,21 +1,17 @@
 import React, { PureComponent } from 'react';
+import socketIOClient from 'socket.io-client';
+
 import './App.css';
 import Row from './Row';
-import socketIOClient from 'socket.io-client';
+import { emptyConnect4 } from './consts';
+
 const socket = socketIOClient("http://127.0.0.1:8080");
 
 class ConnectFour extends PureComponent {
   constructor() {
     super();
     this.state = {
-      board: [
-        [0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0],
-      ]
+      board: emptyConnect4(),
     };
 
     this.checkWin = this.checkWin.bind(this);
@@ -24,19 +20,27 @@ class ConnectFour extends PureComponent {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.reset && !this.props.reset) {
-      this.setState({
-        board: [
-          [0, 0, 0, 0, 0, 0, 0],
-          [0, 0, 0, 0, 0, 0, 0],
-          [0, 0, 0, 0, 0, 0, 0],
-          [0, 0, 0, 0, 0, 0, 0],
-          [0, 0, 0, 0, 0, 0, 0],
-          [0, 0, 0, 0, 0, 0, 0],
-        ]
+      const emptyBoard = emptyConnect4();
+      // emit to empty board for other player
+      socket.emit('boardUpdate', {
+        player: 2,
+        board: emptyBoard,
       });
+      this.setState({
+        board: emptyBoard,
+      })
     }
   }
 
+  componentDidMount() {
+    socket.on('boardResponse', data => {
+      this.setState({
+        board: data.board
+      });
+    });
+  }
+
+  // checks for win from last piece dropped
   checkWin(row, col, player) {
     const { board } = this.state;
     // check for vertical win
@@ -112,17 +116,18 @@ class ConnectFour extends PureComponent {
       // to the player value
       const newBoard = board;
       newBoard[row][col] = player;
-      // set state for new board and switch players
-      this.setState({
-        board: newBoard,
-      });
 
+      // check for a win
       const winner = this.checkWin(row, col, player);
       setScoreboard({
         winner,
         reset: false
       })
-      socket.emit("playerClick", player);
+      // emit current player and board change
+      socket.emit("boardUpdate", {
+        player,
+        board: newBoard,
+      });
     }
   }
 
