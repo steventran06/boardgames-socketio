@@ -3,6 +3,7 @@ import React, { PureComponent } from 'react';
 // material-ui
 import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
+import Slide from '@material-ui/core/Slide';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 
@@ -38,38 +39,56 @@ class App extends PureComponent {
     const { gameName, disabled } = this.state;
     const gameLink = `${window.location.href}?game=${gameName.replace(' ', '%20')}`;
     return (
-      <Paper className="paper align-center">
-        <form disabled={disabled} onSubmit={this.createNewGame}>
-          <Typography variant="display1" color="inherit">
-            Create New Game
-          </Typography>
-          <TextField
+      <div>
+        <Paper className="paper align-center">
+          <form
+            className="create-game-text"
             disabled={disabled}
-            error={gameName.length === 0}
-            label="Room Name"
-            placeholder="Enter Room Name"
-            onChange={this.handleChange}
-            margin="normal"
-          /><br /><br />
-
-          <Button
-            disabled={disabled || gameName.length === 0}
-            type="submit"
-            variant="contained"
-            color="primary"
+            onSubmit={this.createNewGame}
           >
-            Create A Room
-          </Button>
-        </form>
+            <Typography variant="display1" color="inherit">
+              Create New Game
+            </Typography>
+            <TextField
+              disabled={disabled}
+              error={gameName.length === 0}
+              label="Room Name"
+              placeholder="Enter Room Name"
+              onChange={this.handleChange}
+              margin="normal"
+            /><br /><br />
+
+            <Button
+              disabled={disabled || gameName.length === 0}
+              type="submit"
+              variant="contained"
+              color="primary"
+            >
+              Create A Room
+            </Button>
+          </form>
+        </Paper>
         {disabled &&
-          <div>
-            <h2>Share link with friend and play!</h2>
-            <a href={gameLink} target="_blank">
-              {gameLink}
-            </a>
-          </div>
+          <Slide
+            className="create-game-text align-center"
+            direction="up"
+            in
+            mountOnEnter
+            unmountOnExit
+          >
+            <div>
+              <Typography variant="headline" color="inherit">
+                Share link with friend and play!
+              </Typography>
+              <Typography variant="subheading" color="inherit">
+                <a href={gameLink} target="_blank">
+                  {gameLink}
+                </a>
+              </Typography>
+            </div>
+          </Slide>
         }
-      </Paper>
+      </div>
     );
   }
 }
