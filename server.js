@@ -18,7 +18,6 @@ io.on('connection', socket => {
   console.log('Client connected');
   // switches player turn on click
   socket.on('boardUpdate', data => {
-    console.log(data);
     const nextPlayer = data.player === 1 ? 2 : 1;
     socket.broadcast.emit('boardResponse', { player: nextPlayer, board: data.board });
   });

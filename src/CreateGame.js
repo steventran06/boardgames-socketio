@@ -1,5 +1,11 @@
 import React, { PureComponent } from 'react';
 
+// material-ui
+import Paper from '@material-ui/core/Paper';
+import Button from '@material-ui/core/Button';
+import TextField from '@material-ui/core/TextField';
+import Typography from '@material-ui/core/Typography';
+
 import './App.css';
 
 class App extends PureComponent {
@@ -30,21 +36,30 @@ class App extends PureComponent {
 
   render() {
     const { gameName, disabled } = this.state;
-    const gameLink = `${window.location.href}?game=${gameName}`;
+    const gameLink = `${window.location.href}?game=${gameName.replace(' ', '%20')}`;
     return (
-      <div>
+      <Paper className="paper align-center">
         <form disabled={disabled} onSubmit={this.createNewGame}>
-          <input
+          <Typography variant="display1" color="inherit">
+            Create New Game
+          </Typography>
+          <TextField
             disabled={disabled}
+            error={gameName.length === 0}
+            label="Room Name"
+            placeholder="Enter Room Name"
             onChange={this.handleChange}
-            type="text"
-            value={gameName}
+            margin="normal"
           /><br /><br />
-          <input
-            disabled={disabled}
+
+          <Button
+            disabled={disabled || gameName.length === 0}
             type="submit"
-            value="Submit"
-          />
+            variant="contained"
+            color="primary"
+          >
+            Create A Room
+          </Button>
         </form>
         {disabled &&
           <div>
@@ -54,7 +69,7 @@ class App extends PureComponent {
             </a>
           </div>
         }
-      </div>
+      </Paper>
     );
   }
 }

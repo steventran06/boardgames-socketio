@@ -1,0 +1,25 @@
+{
+  "rules": {
+    "arrow-parens": 0,
+    "import/no-unresolved": 0,
+    "import/extensions": 0,
+    "import/no-extraneous-dependencies": 0,
+    "react/jsx-no-bind": 0,
+    "react/forbid-prop-types": 0,
+    "react/jsx-filename-extension": 0,
+    "react/prefer-es6-class": 0,
+    "new-cap": 0,
+    "no-else-return": 0,
+    "indent": [2, 2, {"SwitchCase": 1}],
+    "max-len": [1, 140, 2],
+    "quote-props": [2, "consistent-as-needed"],
+    "comma-dangle": ["error", {
+      "arrays": "only-multiline",
+      "objects": "only-multiline",
+      "imports": "only-multiline",
+      "exports": "only-multiline",
+      "functions": "ignore",
+    }]
+  },
+  "parser": "babel-eslint"
+}

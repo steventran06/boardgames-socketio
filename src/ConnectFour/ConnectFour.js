@@ -1,9 +1,12 @@
 import React, { PureComponent } from 'react';
 import socketIOClient from 'socket.io-client';
 
-import './App.css';
-import Row from './Row';
-import { emptyConnect4 } from './consts';
+// material-ui
+import Paper from '@material-ui/core/Paper';
+import Grid from '@material-ui/core/Grid';
+
+import Square from './Square';
+import { emptyGameBoard } from '../helpers';
 
 const socket = socketIOClient("http://127.0.0.1:8080");
 
@@ -11,7 +14,7 @@ class ConnectFour extends PureComponent {
   constructor() {
     super();
     this.state = {
-      board: emptyConnect4(),
+      board: emptyGameBoard(6, 7),
     };
 
     this.checkWin = this.checkWin.bind(this);
@@ -20,7 +23,7 @@ class ConnectFour extends PureComponent {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.reset && !this.props.reset) {
-      const emptyBoard = emptyConnect4();
+      const emptyBoard = emptyGameBoard(6, 7);
       // emit to empty board for other player
       socket.emit('boardUpdate', {
         player: 2,
@@ -45,7 +48,8 @@ class ConnectFour extends PureComponent {
     const { board } = this.state;
     // check for vertical win
     let vertCount = 1;
-    while (board[row + vertCount] && board[row + vertCount][col] === player) {
+    while (board[row + vertCount] &&
+      board[row + vertCount][col] === player) {
       vertCount++;
     }
     if (vertCount >= 4) {
@@ -55,7 +59,8 @@ class ConnectFour extends PureComponent {
     // check for horizontal win
     // check left to see if there are same pieces
     let horizStart = 0;
-    while (board[row][col + horizStart - 1] && board[row][col + horizStart - 1] === player) {
+    while (board[row][col + horizStart - 1] &&
+      board[row][col + horizStart - 1] === player) {
       horizStart--;
     }
     // check to the right and count
@@ -70,12 +75,14 @@ class ConnectFour extends PureComponent {
     // check for minor diagonal win
     // check row - 1 and col - 1 to see if there are the same pieces
     let minorStart = 0;
-    while (board[row - minorStart - 1] && board[row - minorStart - 1][col - minorStart - 1] === player) {
+    while (board[row - minorStart - 1] &&
+      board[row - minorStart - 1][col - minorStart - 1] === player) {
       minorStart++;
     }
     // check to the right and down one and count
     let minorCount = 1;
-    while (board[row - minorStart + minorCount] && board[row - minorStart + minorCount][col - minorStart + minorCount] === player) {
+    while (board[row - minorStart + minorCount] &&
+      board[row - minorStart + minorCount][col - minorStart + minorCount] === player) {
       minorCount++;
     }
     if (minorCount >= 4) {
@@ -85,12 +92,14 @@ class ConnectFour extends PureComponent {
     // check for major diagonal win
     // check row + 1 and col - 1 to see if there are the same pieces
     let majorStart = 0;
-    while (board[row + majorStart + 1] && board[row + majorStart + 1][col - majorStart - 1] === player) {
+    while (board[row + majorStart + 1] &&
+      board[row + majorStart + 1][col - majorStart - 1] === player) {
       majorStart++;
     }
     // check to the right and up one and count
     let majorCount = 1;
-    while (board[row + majorStart - majorCount] && board[row + majorStart - majorCount][col - majorStart + majorCount] === player) {
+    while (board[row + majorStart - majorCount] &&
+      board[row + majorStart - majorCount][col - majorStart + majorCount] === player) {
       majorCount++;
     }
     if (majorCount >= 4) {
@@ -134,16 +143,24 @@ class ConnectFour extends PureComponent {
   render() {
     const { board } = this.state;
     return (
-      <div className="connect-four">
-        {board.map((row, i) =>
-          <Row
-            key={`row${i}`}
-            row={i}
-            arr={row}
-            dropPiece={this.dropPiece}
-          />)
-        }
-      </div>
+      <Paper className="paper align-center">
+        <Grid container spacing={8}>
+          {board.map((row, i) =>
+            <Grid item xs={12} className="connect-four-row">
+              <Grid container spacing={8}>
+                {row.map((value, i) =>
+                  <Square
+                    key={`col${i}`}
+                    col={i}
+                    value={value}
+                    dropPiece={this.dropPiece}
+                  />)
+                }
+              </Grid>
+            </Grid>
+          )}
+        </Grid>
+      </Paper>
     );
   }
 }
