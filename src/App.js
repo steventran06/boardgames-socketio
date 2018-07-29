@@ -6,7 +6,9 @@ const socket = socketIOClient("http://127.0.0.1:8080");
 import AppBar from '@material-ui/core/AppBar';
 import Grid from '@material-ui/core/Grid';
 import IconButton from '@material-ui/core/IconButton';
+import Menu from '@material-ui/core/Menu';
 import MenuIcon from '@material-ui/icons/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
 import Slide from '@material-ui/core/Slide';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
@@ -18,6 +20,8 @@ import ConnectFour from './ConnectFour/ConnectFour';
 import CreateGame from './CreateGame';
 import Scoreboard from './Scoreboard';
 
+const gamesAvailable = ['Connect Four'];
+
 class App extends PureComponent {
   constructor() {
     super();
@@ -27,12 +31,14 @@ class App extends PureComponent {
     this.state = {
       checked: true,
       hasGameParam: game,
+      menuOpen: false,
       player: 1,
-      winner: false,
       reset: false,
+      winner: false,
     };
 
     this.setScoreboard = this.setScoreboard.bind(this);
+    this.toggleMenu = this.toggleMenu.bind(this);
     this.triggerReset = this.triggerReset.bind(this);
   }
 
@@ -48,6 +54,11 @@ class App extends PureComponent {
     this.setState({ winner, reset })
   }
 
+  toggleMenu() {
+    const { menuOpen } = this.state;
+    this.setState({ menuOpen: !menuOpen });
+  }
+
   triggerReset() {
     this.setState({
       player: 1,
@@ -57,14 +68,26 @@ class App extends PureComponent {
   }
 
   render() {
-    const { checked, hasGameParam, player, reset, winner } = this.state;
+    const { menuOpen, checked, hasGameParam, player, reset, winner } = this.state;
     return (
       <div>
         <AppBar position="static">
           <Toolbar>
-            <IconButton color="inherit" aria-label="Menu">
+            <IconButton
+              color="inherit"
+              aria-label="Menu"
+              onClick={this.toggleMenu}
+            >
               <MenuIcon />
             </IconButton>
+            <Menu
+              open={Boolean(menuOpen)}
+              onClose={this.toggleMenu}
+            >
+              {gamesAvailable.map(game =>
+                <MenuItem onClick={this.toggleMenu}>{game}</MenuItem>
+              )}
+            </Menu>
             <Typography variant="headline" color="inherit">
               Games and Stuff
             </Typography>
